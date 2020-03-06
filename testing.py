@@ -661,12 +661,12 @@ class MarketMaker( object ):
                             raise
                         except:
                             try:
-
-                                if self.arbmult[fut]['arb'] >= 1 and 'PERPETUAL' not in fut or self.arbmult[fut]['arb'] < 1 and 'PERPETUAL' in fut or 'PERPETUAL' in fut and self.positions[fut]['size'] + qty < 0:
-                                    self.client.sell( fut, qty, prc, 'true' )
-
-                                if self.positions[fut]['size'] + qty < 0 and 'PERPETUAL' not in fut or 'PERPETUAL' in fut and self.positions[fut]['size'] + qty < 0:
-                                    self.client.buy( fut, qty, prc, 'true' )
+                                if place_asks and i < nasks
+                                    if self.arbmult[fut]['arb'] >= 1 and 'PERPETUAL' not in fut or self.arbmult[fut]['arb'] < 1 and 'PERPETUAL' in fut or 'PERPETUAL' in fut and self.positions[fut]['size'] + qty < 0:
+                                        self.client.sell( fut, qty, prc, 'true' )
+                                if place_bids and i < nbids:
+                                    if self.positions[fut]['size'] + qty < 0 and 'PERPETUAL' not in fut or 'PERPETUAL' in fut and self.positions[fut]['size'] + qty < 0:
+                                        self.client.buy( fut, qty, prc, 'true' )
                                 cancel_oids.append( oid )
                                 self.logger.warn( 'Sell Edit failed for %s' % oid )
                             except (SystemExit, KeyboardInterrupt):
@@ -674,12 +674,12 @@ class MarketMaker( object ):
                             except Exception as e:
                                 if 'BTC-PERPETUAL' in str(e):
                                     try:
-
-                                        if self.thearb < 1 and 'PERPETUAL' in fut or 'PERPETUAL' in fut and self.positions[fut]['size'] + qty < 0:
-                                            self.client.buy( fut, qty, prc, 'true' )
-
-                                        if self.positions[fut]['size'] - qty > 0:
-                                            self.client.sell( fut, qty, prc, 'true' )
+                                        if place_bids and i < nbids:
+                                            if self.thearb < 1 and 'PERPETUAL' in fut or 'PERPETUAL' in fut and self.positions[fut]['size'] + qty < 0:
+                                                self.client.buy( fut, qty, prc, 'true' )
+                                        if place_asks and i < nasks
+                                            if self.positions[fut]['size'] - qty > 0:
+                                                self.client.sell( fut, qty, prc, 'true' )
                                     except Exception as e:
                                         print(e)
 
@@ -692,24 +692,24 @@ class MarketMaker( object ):
 
                     else:
                         try:
-
-                            if self.arbmult[fut]['arb'] >= 1 and 'PERPETUAL' not in fut or self.arbmult[fut]['arb'] < 1 and 'PERPETUAL' in fut:
-                                self.client.sell(  fut, qty, prc, 'true' )
-
-                            if self.positions[fut]['size'] + qty < 0 and 'PERPETUAL' not in fut:
-                                self.client.buy( fut, qty, prc, 'true' )
+                            if place_asks and i < nasks
+                                if self.arbmult[fut]['arb'] >= 1 and 'PERPETUAL' not in fut or self.arbmult[fut]['arb'] < 1 and 'PERPETUAL' in fut:
+                                    self.client.sell(  fut, qty, prc, 'true' )
+                            if place_bids and n < nbids:
+                                if self.positions[fut]['size'] + qty < 0 and 'PERPETUAL' not in fut:
+                                    self.client.buy( fut, qty, prc, 'true' )
                         except (SystemExit, KeyboardInterrupt):
                             raise
                         except Exception as e:
                             if 'BTC-PERPETUAL' in str(e):
                                 try:
 
-                                  
-                                    if self.thearb < 1 and 'PERPETUAL' in fut or 'PERPETUAL' in fut and self.positions[fut]['size'] + qty < 0:
-                                        self.client.buy( fut, qty, prc, 'true' )
-
-                                    if  self.positions[fut]['size'] - qty > 0:
-                                        self.client.sell( fut, qty, prc, 'true' )
+                                    if place_bids and n < nbids:
+                                        if self.thearb < 1 and 'PERPETUAL' in fut or 'PERPETUAL' in fut and self.positions[fut]['size'] + qty < 0:
+                                            self.client.buy( fut, qty, prc, 'true' )
+                                    if place_asks and i < nasks
+                                        if  self.positions[fut]['size'] - qty > 0:
+                                            self.client.sell( fut, qty, prc, 'true' )
 
                                 except Exception as e:
                                     print(e)
