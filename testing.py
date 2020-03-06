@@ -695,7 +695,7 @@ class MarketMaker( object ):
                             if place_asks and i < nasks:
                                 if self.arbmult[fut]['arb'] >= 1 and 'PERPETUAL' not in fut or self.arbmult[fut]['arb'] < 1 and 'PERPETUAL' in fut:
                                     self.client.sell(  fut, qty, prc, 'true' )
-                            if place_bids and n < nbids:
+                            if place_bids and i < nbids:
                                 if self.positions[fut]['size'] + qty < 0 and 'PERPETUAL' not in fut:
                                     self.client.buy( fut, qty, prc, 'true' )
                         except (SystemExit, KeyboardInterrupt):
@@ -704,7 +704,7 @@ class MarketMaker( object ):
                             if 'BTC-PERPETUAL' in str(e):
                                 try:
 
-                                    if place_bids and n < nbids:
+                                    if place_bids and i < nbids:
                                         if self.thearb < 1 and 'PERPETUAL' in fut or 'PERPETUAL' in fut and self.positions[fut]['size'] + qty < 0:
                                             self.client.buy( fut, qty, prc, 'true' )
                                     if place_asks and i < nasks:
