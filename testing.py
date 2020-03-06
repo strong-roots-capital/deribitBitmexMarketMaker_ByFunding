@@ -82,11 +82,11 @@ MAX_LAYERS          =  3# max orders to layer the ob with on each side
 MKT_IMPACT          =  0      # base 1-sided spread between bid/offer
 NLAGS               =  2        # number of lags in time series
 PCT                 = 100 * BP  # one percentage point
-PCT_LIM_LONG        = 50       # % position limit long
-PCT_LIM_SHORT       = 50    # % position limit short
-PCT_QTY_BASE        = 20  # pct order qty in bps as pct of acct on each order
+PCT_LIM_LONG        = 2       # % position limit long
+PCT_LIM_SHORT       = 2    # % position limit short
+PCT_QTY_BASE        = 20/6  # pct order qty in bps as pct of acct on each order
 MIN_LOOP_TIME       =   0.1       # Minimum time between loops
-RISK_CHARGE_VOL     =   1.5   # vol risk charge in bps per 100 vol
+RISK_CHARGE_VOL     =   9   # vol risk charge in bps per 100 vol
 SECONDS_IN_DAY      = 3600 * 24
 SECONDS_IN_YEAR     = 365 * SECONDS_IN_DAY
 WAVELEN_MTIME_CHK   = 15        # time in seconds between check for file change
@@ -104,8 +104,8 @@ PCT_LIM_SHORT       *= PCT
 PCT_QTY_BASE        *= BP
 VOL_PRIOR           *= PCT
 
-TP = 1.12
-SL = -0.38
+TP = 25
+SL = -25
 
 class MarketMaker( object ):
     
@@ -562,7 +562,7 @@ class MarketMaker( object ):
                     if 'ETH' in fut:
                         qty = round( (prc * qtybtc / (con_sz / 1)) * self.get_eth()) 
                         print(qty)
-                    if 'PERPETUAL' in fut:
+                    if 'PERPETUAL' in fut and self.thearb > 1:
                         qty = qty * len(self.futures)
                     if i < len_bid_ords:    
 
@@ -651,7 +651,7 @@ class MarketMaker( object ):
                         
                         qty = round( (prc * qtybtc / (con_sz / 1)) * self.get_eth())
 
-                    if 'PERPETUAL' in fut:
+                    if 'PERPETUAL' in fut and self.thearb < 1: 
                         qty = qty * len(self.futures)
                     if i < len_ask_ords:
                         oid = ask_ords[ i ][ 'orderId' ]
