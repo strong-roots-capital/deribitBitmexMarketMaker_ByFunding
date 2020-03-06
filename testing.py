@@ -661,7 +661,7 @@ class MarketMaker( object ):
                             raise
                         except:
                             try:
-                                if place_asks and i < nasks
+                                if place_asks and i < nasks:
                                     if self.arbmult[fut]['arb'] >= 1 and 'PERPETUAL' not in fut or self.arbmult[fut]['arb'] < 1 and 'PERPETUAL' in fut or 'PERPETUAL' in fut and self.positions[fut]['size'] + qty < 0:
                                         self.client.sell( fut, qty, prc, 'true' )
                                 if place_bids and i < nbids:
@@ -677,7 +677,7 @@ class MarketMaker( object ):
                                         if place_bids and i < nbids:
                                             if self.thearb < 1 and 'PERPETUAL' in fut or 'PERPETUAL' in fut and self.positions[fut]['size'] + qty < 0:
                                                 self.client.buy( fut, qty, prc, 'true' )
-                                        if place_asks and i < nasks
+                                        if place_asks and i < nasks:
                                             if self.positions[fut]['size'] - qty > 0:
                                                 self.client.sell( fut, qty, prc, 'true' )
                                     except Exception as e:
@@ -692,7 +692,7 @@ class MarketMaker( object ):
 
                     else:
                         try:
-                            if place_asks and i < nasks
+                            if place_asks and i < nasks:
                                 if self.arbmult[fut]['arb'] >= 1 and 'PERPETUAL' not in fut or self.arbmult[fut]['arb'] < 1 and 'PERPETUAL' in fut:
                                     self.client.sell(  fut, qty, prc, 'true' )
                             if place_bids and n < nbids:
@@ -707,7 +707,7 @@ class MarketMaker( object ):
                                     if place_bids and n < nbids:
                                         if self.thearb < 1 and 'PERPETUAL' in fut or 'PERPETUAL' in fut and self.positions[fut]['size'] + qty < 0:
                                             self.client.buy( fut, qty, prc, 'true' )
-                                    if place_asks and i < nasks
+                                    if place_asks and i < nasks:
                                         if  self.positions[fut]['size'] - qty > 0:
                                             self.client.sell( fut, qty, prc, 'true' )
 
