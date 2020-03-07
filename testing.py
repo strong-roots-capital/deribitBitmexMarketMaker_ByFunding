@@ -468,15 +468,13 @@ class MarketMaker( object ):
             pos_decay       = 1.0 - math.exp( -DECAY_POS_LIM * tte )
             #pos_lim_long   *= pos_decay
             #pos_lim_short  *= pos_decay
-            print(pos_lim_short)
+            
 
             pos_lim_long   -= pos
             pos_lim_short  += pos
-            print(pos_lim_short)
 
             pos_lim_long    = max( 0, pos_lim_long  )
             pos_lim_short   = max( 0, pos_lim_short )
-            print(pos_lim_short)
 
             min_order_size_btc = MIN_ORDER_SIZE / spot * CONTRACT_SIZE
             
@@ -487,14 +485,7 @@ class MarketMaker( object ):
             
             place_bids = nbids > 0
             place_asks = nasks > 0
-            print(fut)
-            print(qtybtc)
-            print('place_Bids')
-            print(place_bids)
-            print(nbids)
-            print('place_asks')
-            print(place_asks)
-            print(nasks)
+            
             #buy bid sell ask
             if self.dsrsi > 80: #over
                 place_bids = 0
@@ -580,11 +571,6 @@ class MarketMaker( object ):
                         print(qty)
                     if 'PERPETUAL' in fut and self.thearb > 1:
                         qty = qty * len(self.futures)
-                    print(self.positions[fut]['size'])
-                    print(qty)
-                    print(self.positions[fut]['size'] + qty < 0)
-                    print(self.arbmult[fut]['arb'])
-                    print( i < len_bid_ords)
                     if i < len_bid_ords:    
 
                         oid = bid_ords[ i ][ 'orderId' ]
@@ -756,6 +742,7 @@ class MarketMaker( object ):
                 #cancel_oids += [ o[ 'orderId' ] for o in ask_ords[ nasks : ]]
 
             for oid in cancel_oids:
+                print(oid)
                 try:
                     self.client.cancel( oid )
                 except:
@@ -770,7 +757,7 @@ class MarketMaker( object ):
             strMsg += ' '
             for i in range( 0, 5 ):
                 strMsg += '.'
-                #print( strMsg )
+                print( strMsg )
                 sleep( 1 )
         except:
             pass
@@ -843,8 +830,8 @@ class MarketMaker( object ):
                 self.quantity_switch = data['quantity']
 
             # Restart if a new contract is listed
-            if len( self.futures ) != len( self.futures_prv ):
-                self.restart()
+            #if len( self.futures ) != len( self.futures_prv ):
+                #self.restart()
             
             self.update_positions()
             
@@ -871,8 +858,8 @@ class MarketMaker( object ):
             t_now   = datetime.utcnow()
             if ( t_now - t_mtime ).total_seconds() > WAVELEN_MTIME_CHK:
                 t_mtime = t_now
-                if getmtime( __file__ ) > self.this_mtime:
-                    self.restart()
+                #if getmtime( __file__ ) > self.this_mtime:
+                 #   self.restart()
             
             t_now       = datetime.utcnow()
             looptime    = ( t_now - t_loop ).total_seconds()
@@ -1121,7 +1108,8 @@ if __name__ == '__main__':
         #print( "Cancelling open orders" )
         mmbot.client.cancelall()
         sys.exit()
-    except:
+    except Exception as e:
+        print(e)
         #print( traceback.format_exc())
         if args.restart:
             mmbot.restart()
