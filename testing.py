@@ -601,7 +601,7 @@ class MarketMaker( object ):
 
                                 if self.positions[fut]['size'] - qty > 0:
                                     self.client.buy( fut, qty, prc, 'true' )
-                                cancel_oids.append( oid )
+                                #cancel_oids.append( oid )
                                 self.logger.warn( 'Edit failed for %s' % oid )
                             except (SystemExit, KeyboardInterrupt):
                                 raise
@@ -614,6 +614,7 @@ class MarketMaker( object ):
 
                                     except Exception as e:
                                         print(e)
+                                        cancel_oids.append( oid )
                                         self.logger.warn( 'Bid order failed: %s bid for %s'
                                                 % ( prc, qty ))
                     else:
@@ -636,6 +637,7 @@ class MarketMaker( object ):
                                         self.client.buy(  fut, qty, prc, 'true' )
                                 except Exception as e:
                                     print(e)
+                                    cancel_oids.append( oid )
                                     self.logger.warn( 'Bid order failed: %s bid for %s'
                                                 % ( prc, qty ))
 
@@ -697,7 +699,7 @@ class MarketMaker( object ):
                                 if place_bids and i < nbids:
                                     if self.positions[fut]['size'] + qty < 0:
                                         self.client.buy( fut, qty, prc, 'true' )
-                                cancel_oids.append( oid )
+                                #cancel_oids.append( oid )
                                 self.logger.warn( 'Sell Edit failed for %s' % oid )
                             except (SystemExit, KeyboardInterrupt):
                                 raise
@@ -712,12 +714,12 @@ class MarketMaker( object ):
                                                 self.client.sell( fut, qty, prc, 'true' )
                                     except Exception as e:
                                         print(e)
-
+                                        cancel_oids.append( oid )
                                 
                                         self.logger.warn( 'Sell Edit failed for %s' % oid )
                                         self.logger.warn( 'Offer order failed: %s at %s'
                                                         % ( qty, prc ))
-                                cancel_oids.append( oid )
+                                #cancel_oids.append( oid )
 
 
                     else:
@@ -743,7 +745,7 @@ class MarketMaker( object ):
 
                                 except Exception as e:
                                     print(e)
-                        
+                                    cancel_oids.append( oid )
                                     self.logger.warn( 'Offer order failed: %s at %s'
                                                 % ( qty, prc ))
 
