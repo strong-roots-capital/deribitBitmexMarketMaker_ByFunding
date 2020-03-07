@@ -750,10 +750,11 @@ class MarketMaker( object ):
                                                 % ( qty, prc ))
 
 
-            if nbids < len( bid_ords ):
-                cancel_oids += [ o[ 'orderId' ] for o in bid_ords[ nbids : ]]
-            if nasks < len( ask_ords ):
-                cancel_oids += [ o[ 'orderId' ] for o in ask_ords[ nasks : ]]
+            #if nbids < len( bid_ords ):
+            #    cancel_oids += [ o[ 'orderId' ] for o in bid_ords[ nbids : ]]
+            #if nasks < len( ask_ords ):
+                #cancel_oids += [ o[ 'orderId' ] for o in ask_ords[ nasks : ]]
+
             for oid in cancel_oids:
                 try:
                     self.client.cancel( oid )
