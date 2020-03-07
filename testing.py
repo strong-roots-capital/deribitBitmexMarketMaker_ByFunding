@@ -445,6 +445,10 @@ class MarketMaker( object ):
             bal_btc         = account[ 'equity' ] * 100
             pos_lim_long    = bal_btc * PCT_LIM_LONG / len(self.futures)
             pos_lim_short   = bal_btc * PCT_LIM_SHORT / len(self.futures)
+            print('pos_lim_short')
+            print(account[ 'equity' ] )
+            print(account)
+            print(pos_lim_short)
             if 'PERPETUAL' in fut:
                 pos_lim_short = pos_lim_short * len(self.futures)
                 pos_lim_long = pos_lim_long * len(self.futures)
@@ -462,22 +466,35 @@ class MarketMaker( object ):
 
             tte             = max( 0, ( expi - datetime.utcnow()).total_seconds() / SECONDS_IN_DAY )
             pos_decay       = 1.0 - math.exp( -DECAY_POS_LIM * tte )
-            pos_lim_long   *= pos_decay
-            pos_lim_short  *= pos_decay
+            #pos_lim_long   *= pos_decay
+            #pos_lim_short  *= pos_decay
+            print(pos_lim_short)
+
             pos_lim_long   -= pos
             pos_lim_short  += pos
+            print(pos_lim_short)
+
             pos_lim_long    = max( 0, pos_lim_long  )
             pos_lim_short   = max( 0, pos_lim_short )
-            
+            print(pos_lim_short)
+
             min_order_size_btc = MIN_ORDER_SIZE / spot * CONTRACT_SIZE
             
-            #qtybtc  = max( PCT_QTY_BASE  * bal_btc, min_order_size_btc)
+            #yqbtc  = max( PCT_QTY_BASE  * bal_btc, min_order_size_btc)
             qtybtc = PCT_QTY_BASE  * bal_btc
             nbids   = min( math.trunc( pos_lim_long  / qtybtc ), MAX_LAYERS )
             nasks   = min( math.trunc( pos_lim_short / qtybtc ), MAX_LAYERS )
             
             place_bids = nbids > 0
             place_asks = nasks > 0
+            print(fut)
+            print(qtybtc)
+            print('place_Bids')
+            print(place_bids)
+            print(nbids)
+            print('place_asks')
+            print(place_asks)
+            print(nasks)
             #buy bid sell ask
             if self.dsrsi > 80: #over
                 place_bids = 0
@@ -537,7 +554,6 @@ class MarketMaker( object ):
                 #print('nbids')
                 #print(nbids)
                 #print('nasks')
-                #print(nasks)
                 if place_bids and i < nbids:
 
                     if i > 0:
@@ -564,6 +580,11 @@ class MarketMaker( object ):
                         print(qty)
                     if 'PERPETUAL' in fut and self.thearb > 1:
                         qty = qty * len(self.futures)
+                    print(self.positions[fut]['size'])
+                    print(qty)
+                    print(self.positions[fut]['size'] + qty < 0)
+                    print(self.arbmult[fut]['arb'])
+                    print( i < len_bid_ords)
                     if i < len_bid_ords:    
 
                         oid = bid_ords[ i ][ 'orderId' ]
@@ -573,17 +594,19 @@ class MarketMaker( object ):
                             raise
                         except:
                             try:
+                                if self.arbmult[fut]['arb'] >= 1 and self.positions[fut]['size'] + qty < 0:
+                                    self.client.buy( fut, qty, prc, 'true' )
                                 if self.arbmult[fut]['arb'] <= 1 and 'PERPETUAL' not in fut or self.arbmult[fut]['arb'] > 1 and 'PERPETUAL' in fut:
                                     self.client.buy(  fut, qty, prc, 'true' )
 
-                                if self.positions[fut]['size'] - qty > 0 and 'PERPETUAL' not in fut or 'PERPETUAL' in fut and self.positions[fut]['size'] - qty > 0:
+                                if self.positions[fut]['size'] - qty > 0:
                                     self.client.buy( fut, qty, prc, 'true' )
                                 cancel_oids.append( oid )
                                 self.logger.warn( 'Edit failed for %s' % oid )
                             except (SystemExit, KeyboardInterrupt):
                                 raise
                             except Exception as e:
-
+                                print(e)
                                 if 'BTC-PERPETUAL' in str(e):
                                     try:
                                         if self.thearb <= 1 and 'PERPETUAL' not in fut or self.thearb > 1 and 'PERPETUAL' in fut:
@@ -595,7 +618,8 @@ class MarketMaker( object ):
                                                 % ( prc, qty ))
                     else:
                         try:
-
+                            if self.arbmult[fut]['arb'] >= 1 and self.positions[fut]['size'] + qty < 0:
+                                    self.client.buy( fut, qty, prc, 'true' )
                             if self.positions[fut]['size'] - qty > 0 and 'PERPETUAL' not in fut or 'PERPETUAL' in fut and self.positions[fut]['size'] - qty > 0:
                                     self.client.buy( fut, qty, prc, 'true' )
 
@@ -653,6 +677,9 @@ class MarketMaker( object ):
 
                     if 'PERPETUAL' in fut and self.thearb < 1: 
                         qty = qty * len(self.futures)
+                    
+                    print(self.positions[fut]['size'])
+                    print(qty)
                     if i < len_ask_ords:
                         oid = ask_ords[ i ][ 'orderId' ]
                         try:
@@ -662,10 +689,13 @@ class MarketMaker( object ):
                         except:
                             try:
                                 if place_asks and i < nasks:
-                                    if self.arbmult[fut]['arb'] >= 1 and 'PERPETUAL' not in fut or self.arbmult[fut]['arb'] < 1 and 'PERPETUAL' in fut or 'PERPETUAL' in fut and self.positions[fut]['size'] + qty < 0:
+                                    if self.arbmult[fut]['arb'] >= 1 and self.positions[fut]['size'] + qty < 0:
                                         self.client.sell( fut, qty, prc, 'true' )
+                                if self.arbmult[fut]['arb'] <= 1 and 'PERPETUAL' not in fut or self.arbmult[fut]['arb'] > 1 and 'PERPETUAL' in fut:
+                                    self.client.sell(  fut, qty, prc, 'true' )
+
                                 if place_bids and i < nbids:
-                                    if self.positions[fut]['size'] + qty < 0 and 'PERPETUAL' not in fut or 'PERPETUAL' in fut and self.positions[fut]['size'] + qty < 0:
+                                    if self.positions[fut]['size'] + qty < 0:
                                         self.client.buy( fut, qty, prc, 'true' )
                                 cancel_oids.append( oid )
                                 self.logger.warn( 'Sell Edit failed for %s' % oid )
@@ -693,8 +723,8 @@ class MarketMaker( object ):
                     else:
                         try:
                             if place_asks and i < nasks:
-                                if self.arbmult[fut]['arb'] >= 1 and 'PERPETUAL' not in fut or self.arbmult[fut]['arb'] < 1 and 'PERPETUAL' in fut:
-                                    self.client.sell(  fut, qty, prc, 'true' )
+                                    if self.arbmult[fut]['arb'] >= 1 and self.positions[fut]['size'] + qty < 0:
+                                        self.client.sell( fut, qty, prc, 'true' )
                             if place_bids and i < nbids:
                                 if self.positions[fut]['size'] + qty < 0 and 'PERPETUAL' not in fut:
                                     self.client.buy( fut, qty, prc, 'true' )
@@ -1079,5 +1109,17 @@ class MarketMaker( object ):
             self.vols[ s ] = math.sqrt( v )
                             
 
-mmbot = MarketMaker( monitor = args.monitor, output = args.output )
-mmbot.run()
+if __name__ == '__main__':
+    
+    try:
+        mmbot = MarketMaker( monitor = args.monitor, output = args.output )
+        mmbot.run()
+    except( KeyboardInterrupt, SystemExit ):
+        #print( "Cancelling open orders" )
+        mmbot.client.cancelall()
+        sys.exit()
+    except:
+        #print( traceback.format_exc())
+        if args.restart:
+            mmbot.restart()
+        
