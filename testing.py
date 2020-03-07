@@ -573,8 +573,9 @@ class MarketMaker( object ):
                         qty = qty * len(self.futures)
                     if i < len_bid_ords:    
 
-                        oid = bid_ords[ i ][ 'orderId' ]
+                        
                         try:
+                            oid = bid_ords[ i ][ 'orderId' ]
                             self.client.edit( oid, qty, prc )
                         except (SystemExit, KeyboardInterrupt):
                             raise
@@ -604,6 +605,12 @@ class MarketMaker( object ):
                                         self.logger.warn( 'Bid order failed: %s bid for %s'
                                                 % ( prc, qty ))
                     else:
+                        
+                        try:
+                            oid = bid_ords[ i ][ 'orderId' ]
+                            self.client.edit( oid, qty, prc )
+                        except:
+                            print('edit error')
                         try:
                             if self.arbmult[fut]['arb'] >= 1 and self.positions[fut]['size'] + qty < 0:
                                     self.client.buy( fut, qty, prc, 'true' )
@@ -669,8 +676,9 @@ class MarketMaker( object ):
                     print(self.positions[fut]['size'])
                     print(qty)
                     if i < len_ask_ords:
-                        oid = ask_ords[ i ][ 'orderId' ]
+                        
                         try:
+                            oid = ask_ords[ i ][ 'orderId' ]
                             self.client.edit( oid, qty, prc )
                         except (SystemExit, KeyboardInterrupt):
                             raise
@@ -709,6 +717,12 @@ class MarketMaker( object ):
 
 
                     else:
+                        
+                        try:
+                            oid = ask_ords[ i ][ 'orderId' ]
+                            self.client.edit( oid, qty, prc )
+                        except:
+                            print('edit error')
                         try:
                             if place_asks and i < nasks:
                                     if self.arbmult[fut]['arb'] >= 1 and self.positions[fut]['size'] + qty < 0:
