@@ -83,8 +83,8 @@ MKT_IMPACT          =  0      # base 1-sided spread between bid/offer
 NLAGS               =  2        # number of lags in time series
 PCT                 = 100 * BP  # one percentage point
 PCT_LIM_LONG        = 2       # % position limit long
-PCT_LIM_SHORT       = 2    # % position limit short
-PCT_QTY_BASE        = 20/6  # pct order qty in bps as pct of acct on each order
+PCT_LIM_SHORT       = 2   # % position limit short
+PCT_QTY_BASE        = 20/3  # pct order qty in bps as pct of acct on each order
 MIN_LOOP_TIME       =   0.1       # Minimum time between loops
 RISK_CHARGE_VOL     =   9   # vol risk charge in bps per 100 vol
 SECONDS_IN_DAY      = 3600 * 24
@@ -445,10 +445,7 @@ class MarketMaker( object ):
             bal_btc         = account[ 'equity' ] * 100
             pos_lim_long    = bal_btc * PCT_LIM_LONG / len(self.futures)
             pos_lim_short   = bal_btc * PCT_LIM_SHORT / len(self.futures)
-            print('pos_lim_short')
-            print(account[ 'equity' ] )
-            print(account)
-            print(pos_lim_short)
+
             if 'PERPETUAL' in fut:
                 pos_lim_short = pos_lim_short * len(self.futures)
                 pos_lim_long = pos_lim_long * len(self.futures)
@@ -612,14 +609,13 @@ class MarketMaker( object ):
                         except:
                             print('edit error')
                         try:
-                            if self.arbmult[fut]['arb'] >= 1 and self.positions[fut]['size'] + qty < 0:
-                                    self.client.buy( fut, qty, prc, 'true' )
-                            if self.positions[fut]['size'] - qty > 0 and 'PERPETUAL' not in fut or 'PERPETUAL' in fut and self.positions[fut]['size'] - qty > 0:
-                                    self.client.buy( fut, qty, prc, 'true' )
+                            
+                            if self.arbmult[fut]['arb'] >= 1 and self.positions[fut]['size'] - qty < 0:
+                                self.client.buy( fut, qty, prc, 'true' )
 
 
-                            if self.arbmult[fut]['arb'] <= 1 and 'PERPETUAL' not in fut or self.arbmult[fut]['arb'] > 1 and 'PERPETUAL' in fut:
-                                self.client.buy(  fut, qty, prc, 'true' )
+                            if self.arbmult[fut]['arb'] <= 1 and self.positions[fut]['size'] - qty < 0:
+                                self.client.sell(  fut, qty, prc, 'true' )
                         except (SystemExit, KeyboardInterrupt):
                             raise
                         except Exception as e:
@@ -673,8 +669,6 @@ class MarketMaker( object ):
                     if 'PERPETUAL' in fut and self.thearb < 1: 
                         qty = qty * len(self.futures)
                     
-                    print(self.positions[fut]['size'])
-                    print(qty)
                     if i < len_ask_ords:
                         
                         try:
@@ -724,12 +718,13 @@ class MarketMaker( object ):
                         except:
                             print('edit error')
                         try:
-                            if place_asks and i < nasks:
-                                    if self.arbmult[fut]['arb'] >= 1 and self.positions[fut]['size'] + qty < 0:
-                                        self.client.sell( fut, qty, prc, 'true' )
-                            if place_bids and i < nbids:
-                                if self.positions[fut]['size'] + qty < 0 and 'PERPETUAL' not in fut:
-                                    self.client.buy( fut, qty, prc, 'true' )
+                            if self.arbmult[fut]['arb'] >= 1 and self.positions[fut]['size'] + qty > 0:
+                                self.client.sell( fut, qty, prc, 'true' )
+
+
+                            if self.arbmult[fut]['arb'] <= 1 and self.positions[fut]['size'] + qty > 0:
+                                self.client.buy(  fut, qty, prc, 'true' )
+
                         except (SystemExit, KeyboardInterrupt):
                             raise
                         except Exception as e:
